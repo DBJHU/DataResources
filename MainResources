@@ -1,0 +1,272 @@
+# Introduction
+
+These are resoures for data science and biostatistics with special focus on OHDSI/OMOP.
+
+# Commonly Used CDM Tables Overview
+The OMOP common data model (CDM) is a relational database made up of different tables that relate to each other by foreign keys (XXXX_ID values; e.g., PERSON_ID or PROVIDER_ID). The OMOP tables in your data export are as follows:
+
+| Table              | Description |
+|--------------------|---------------------|
+| Person             | Contains basic demographic information describing a participant, including biological sex, birth date, race, and ethnicity. |
+| Visit_occurrence   | Captures encounters with healthcare providers or similar events. Contains the type of visit a person has (outpatient care, inpatient care, or long-term care), as well as the date and duration information. Rows in other tables can reference this table, for example, condition_occurrences related to a specific visit. |
+| Condition_occurrence | Indicates the presence of a disease or medical condition stated as a diagnosis, a sign, or symptom, which is either observed by a provider or reported by the patient. |
+| Drug_exposure      | Captures records about the utilization of a medication. Drug exposures include prescription and over-the-counter medicines, vaccines, and large-molecule biologic therapies. Radiological devices ingested or applied locally do not count as drugs. Drug exposure is inferred from clinical events associated with orders, prescriptions written, pharmacy dispensing, procedural administrations, and other patient-reported information. |
+| Measurement        | Contains both orders and results of a systematic and standardized examination or testing of a participant or participant's sample, including laboratory tests, vital signs, quantitative findings from pathology reports, etc. |
+| Procedure_occurrence | Contains records of activities or processes ordered by or carried out by a healthcare provider on the patient to have a diagnostic or therapeutic purpose. |
+| Observation        | Captures clinical facts about a person obtained in the context of an examination, questioning, or a procedure. Any data that cannot be represented by another domain, such as social and lifestyle facts, medical history, and family history, are recorded here. |
+| Device_exposure    | Captures information about a person's exposure to a foreign physical object or instrument which is used for diagnostic or therapeutic purposes. Devices include implantable objects, blood transfusions, medical equipment and supplies, other instruments used in medical procedures, and material used in clinical care. |
+| Death              | Contains the clinical events surrounding how and when a participant dies. |
+
+
+# Data Content Ontology
+![Dr. Rachel Richesson presents "Learning to Use EHR Data in Learning Health Systems"](https://img.youtube.com/vi/4uXqNLsiVuc/maxresdefault.jpg)
+
+## Overview of Major Clinical Terminologies and Coding Systems
+
+Here is a detailed overview of several essential clinical terminologies and coding systems used in observational research. 
+
+### SNOMED Clinical Terms (SNOMED CT)
+- **Development:** Originally by the College of American Pathologists, now under SNOMED International.
+- **Adoption:** Used in over 50 countries.
+- **Concepts:** Over 340,000 active concepts in 19 hierarchies.
+- **Usage:** Encodes clinical information including diseases, findings, and procedures.
+- **Updates:** Biannual, with more frequent updates planned.
+- **More Information:** [SNOMED International](https://www.snomed.org/snomed-ct)
+
+### Logical Observation Identifiers Names and Codes (LOINC)
+- **Development:** Regenstrief Institute.
+- **Function:** Identifiers for laboratory and clinical observations.
+- **Content:** Over 90,000 terms.
+- **Collaboration:** With SNOMED CT for coded content development.
+- **Updates:** Biannual.
+- **More Information:** [LOINC](https://loinc.org)
+
+### RxNorm
+- **Developer:** National Library of Medicine (NLM).
+- **Function:** Standard nomenclature for medications.
+- **Integration:** Links to various drug vocabularies.
+- **Access:** Requires UMLS user license for proprietary content.
+- **More Information:** [RxNorm - NLM](https://www.nlm.nih.gov/research/umls/rxnorm)
+
+### International Classification of Disease (ICD)
+- **Endorsement:** World Health Organization (WHO).
+- **Versions:** ICD-10 widely used with national extensions; ICD-11 adopted for future use.
+- **Purpose:** Epidemiology, health management, clinical purposes.
+- **Updates:** Annual, freely available.
+- **More Information:** [WHO ICD](https://www.who.int/classifications/icd)
+
+### Current Procedural Terminology (CPT)
+- **Developer:** American Medical Association (AMA).
+- **Use:** Encoding of medical services and procedures in the USA.
+- **Categories:** Three categories of codes.
+- **Requirement:** License from AMA for use.
+- **More Information:** [CPT - AMA](https://www.ama-assn.org/practice-management/cpt)
+
+### Human Phenotype Ontology (HPO)
+- **Function:** Bioinformatic resources for human diseases and phenotypes analysis.
+- **Components:** Phenotype vocabulary, disease-phenotype annotations, algorithms.
+- **Applications:** Genomic interpretation, gene-disease discovery, precision medicine.
+- **Content:** Over 13,000 terms in 5 hierarchies.
+- **Availability:** Freely available, multiple releases per year.
+- **More Information:** [Human Phenotype Ontology](https://hpo.jax.org)
+
+### Unified Medical Language System (UMLS)
+- **Initiation:** By the US National Library of Medicine in 1986.
+- **Goal:** To aid in the retrieval and integration of electronic biomedical information.
+- **Challenge Addressed:** Different vocabularies expressing the same information differently.
+- **Availability:** Free, but requires a license due to additional licensing requirements of some contents.
+- **More Information:** [UMLS - NLM](https://www.nlm.nih.gov/research/umls)
+
+### Ontology Mapping in BioPortal Applications
+- **Process:** Finding the closest match of a code from one ontology in another.
+- **Matching:** Exact equivalence is rare; approximate matching is common.
+- **Challenges:** Labor-intensive and requires understanding the maps' nature and limitations.
+- **Alternative Approach:** Mapping multiple ontologies to a central core terminology, as used by the OHDSI consortium.
+- **More Information:** [BioPortal](https://bioportal.bioontology.org)
+
+### Recommended Reading
+- **Chapter Title**: Knowledge Representation and Ontologies
+- **Authors**: Kin Wah Fung & Olivier Bodenreider
+- **In**: Clinical Research Informatics
+- **Editors**: Rachel L. Richesson, James E. Andrews, Kate Fultz Hollis
+- **Publisher**: Springer Nature
+- **First Online**: 15 June 2023
+- **DOI**: [10.1007/978-3-031-27173-1](https://doi.org/10.1007/978-3-031-27173-1)
+- **Pages**: 367–388
+
+## OMOP Domains by Source to Standard Vocabulary
+```mermaid
+graph LR
+    ICD9("ICD9") -->|Transformation to OMOP CDM| SNOMED("STANDARD<br>Vocabulary Concept Code<br>SNOMED")
+    ICD10("ICD10") -->|Transformation to OMOP CDM| SNOMED
+```
+
+| Domain                    | Source Vocabulary              | Standard Vocabulary       |
+|---------------------------|--------------------------------|---------------------------|
+| Conditions                | ICD9, ICD10                    | SNOMED                    |
+| Measurements              | LOINC or institutional specific codes | LOINC               |
+| Drugs                     | NDC                            | RxNORM                    |
+| Procedures                | ICD9, ICD10, CPT               | SNOMED                    |   |
+
+* ICD = International Classification of Diseases
+* SNOMED = Systematized Nomenclature of Medicine
+* LOINC = Logical Observation Identifiers Names and Codes
+* NDC = National Drug Code
+* CPT = Current Procedural Terminology
+
+### OHDSI Resources
+- [The Book of OHDSI](https://ohdsi.github.io/TheBookOfOhdsi/CommonDataModel.html)
+- [OMOP CDM Documentation](https://ohdsi.github.io/CommonDataModel/cdm53.html)
+- [OHDSI Forums](https://forums.ohdsi.org/) for community support.
+- [Athena](https://athena.ohdsi.org/) to look up individual concepts in your data
+- [NIH ALL of US OMOP Documentation](https://support.researchallofus.org/hc/en-us/articles/360039585391-How-the-Observational-Medical-Outcomes-Partnership-OMOP-vocabulary-are-structured)
+
+### Data Limitations
+Be aware of limitations or biases in the data subset. Not all EHR data are represented in this subset.
+
+# Special Topic:  Cinical Registries Using OHDSI
+
+[![OHDSI and Clinical Registries: Sanity for Health Systems (Aug. 22 Community Call)](http://img.youtube.com/vi/DPatSxFkIpI/0.jpg)](https://youtu.be/DPatSxFkIpI?si=VOqE4VTlzIcxuWdP)
+
+[Clinical Registries in OHDSI - September 2022](https://www.ohdsi.org/wp-content/uploads/2022/09/OHDSI-Clinical_Registries.pdf)
+
+## Data Science Handbook
+[Open, rigorous and reproducible research: A practitioner’s handbook](https://datascience.stanford.edu/programs/stanford-data-science-scholars-program/data-science-handbook) 
+From Standord Data Science
+
+# Analysis Tools
+R, SQL, Python, or any preferred data analysis software. Examples provided below are for R and SQL.
+[The Book of OHDSI Chapter 9] (https://ohdsi.github.io/TheBookOfOhdsi/SqlAndR.html) provides an overview of analysis of OHDSI data in R and SQL; note that you will not be able to avail yourselves of OHDSI software tools when analyzing your exported data for the reason explained above.
+<!-- Note for Clark:  Are there any limitations on software available to researchers at Tufts? -->
+<!-- Note for Clark:  Assume they will not load into a database and rather read the files into R individually. I am adding SQL just in case.-->
+
+## Jupyter Notebooks and programming
+[Source:NIH All of US Study] (https://support.researchallofus.org/hc/en-us/articles/360039690191-Jupyter-Notebooks-and-programming)
+
+Below you will find links to  helpful resources on using Jupyter Notebooks. 
+Below you will find links to some of the most helpful resources that we have created and/or found on using Jupyter Notebooks. While we can’t teach you how to program, we have identified some online resources that can help get you started.
+
+- [Project Jupyter](https://jupyter.org/)
+- [What is the Jupyter Notebook?](https://jupyter-notebook-beginner-guide.readthedocs.io/en/latest/what_is_jupyter.html)
+- [Intro to Jupyter Notebooks and Anaconda (NIAID, NIH)](https://bioinformatics.niaid.nih.gov/resources - 70.1.1)
+
+Software Carpentry is a website that provides free online lessons to researchers wanting to enhance their programming skills for data analysis. This website offers free online lessons on a variety of useful topics including:
+
+- [Programming with Python](http://swcarpentry.github.io/python-novice-inflammation/)
+- [Programming with R](http://swcarpentry.github.io/r-novice-inflammation/)
+- [Databases and SQL](http://swcarpentry.github.io/sql-novice-survey/)
+
+We have included additional resources for help with programming below.
+
+- [DataCamp](http://www.datacamp.com/)
+- [Codecademy - Learn Python 2](https://www.codecademy.com/learn/learn-python)
+- [Python Data Science Handbook](https://jakevdp.github.io/PythonDataScienceHandbook/)
+- [R for Data Science](https://r4ds.hadley.nz/)
+- [Introduction to Programming (NIAID, NIH)](https://bioinformatics.niaid.nih.gov/resources - 70.3.1)
+- [Python Programming (NIAID, NIH)](https://bioinformatics.niaid.nih.gov/resources - 70.3.2)
+- [Data Analysis with Python and Pandas (NIAID, NIH)](https://bioinformatics.niaid.nih.gov/resources - 70.3.3)
+- [Data Visualization with Python (NIAID, NIH)](https://bioinformatics.niaid.nih.gov/resources - 70.3.4)
+
+## Analysis with SQL
+
+The [OMOP Query Library](https://data.ohdsi.org/QueryLibrary/) is a library of commonly-used SQL queries for the OMOP Common Data Model (CDM).
+
+
+## Analysis with R
+Below are some sample R queries that demonstrate how to read in OMOP tables from CSV files, join them based on the `person_id` and `visit_occurrence_id` fields, and search for specific criteria.
+
+Note: Adjust the file paths and column names accordingly based on the actual structure and location of your CSV files. The queries below are a generic representation and may need adjustments based on the specifics of your data set.
+
+### Reading CSV files into R data frames:
+
+```R
+# Read the CSV files into R data frames
+person_df <- read.csv("path_to_person_table.csv", header=TRUE, stringsAsFactors=FALSE)
+visit_occurrence_df <- read.csv("path_to_visit_occurrence_table.csv", header=TRUE, stringsAsFactors=FALSE)
+condition_occurrence_df <- read.csv("path_to_condition_occurrence_table.csv", header=TRUE, stringsAsFactors=FALSE)
+```
+Join tables based on `person_id`:
+
+When a person has multiple visits in the `visit_occurrence` table, joining the `person` table with the `visit_occurrence` table will result in multiple rows for that person, each corresponding to a different visit. This is a standard one-to-many join operation.
+
+```R
+## Join person with visit_occurrence on 'person_id'
+person_visit_df <- merge(person_df, visit_occurrence_df, by="person_id")
+```
+
+### Joining the Person-Visit table with the Condition Occurrence table:
+
+```R
+# Join the person-visit result with condition_occurrence on both 'person_id' and 'visit_occurrence_id'
+full_df <- merge(person_visit_df, condition_occurrence_df, by=c("person_id", "visit_occurrence_id"))
+```
+
+### Search by a list of `person_ids`:
+
+```R
+# Define a list of person_ids to search for
+search_person_ids <- c(1, 2, 3, 4, 5)
+
+# Filter the data frame to only include rows with person_ids in the list
+filtered_by_person_df <- subset(full_df, person_id %in% search_person_ids)
+```
+
+### Search by a specific condition concept code:
+
+```R
+# Define a specific condition concept code to search for
+search_condition_concept_id <- 1234567
+
+# Filter the data frame to only include rows with the specified condition concept code
+filtered_by_condition_df <- subset(full_df, condition_concept_id == search_condition_concept_id)
+```
+
+### Search by a date range:
+
+```R
+# Define a date range to search for
+start_date <- as.Date("2020-01-01")
+end_date <- as.Date("2020-12-31")
+
+## Filter the data frame to only include rows within the date range
+filtered_by_date_df <- subset(full_df, visit_start_date >= start_date & visit_start_date <= end_date)
+```
+#Data quality
+
+[The Book of OHDSI - Chapter 15: Data Quality](https://ohdsi.github.io/TheBookOfOhdsi/DataQuality.html)
+
+## Tufts Bridge2AI Standards Module
+- **June 15, 2023:**  
+  **Data Quality Dashboard**  
+  By: Jared Houghtaling  
+  [![Data Quality Dashboard](https://img.youtube.com/vi/O2L1x0Sv3lc/0.jpg)](https://youtu.be/O2L1x0Sv3lc)
+
+[Kahn MG, Callahan TJ, Barnard J, Bauck AE, Brown J, Davidson BN, Estiri H, Goerg C, Holve E, Johnson SG, Liaw ST, Hamilton-Lopez M, Meeker D, Ong TC, Ryan P, Shang N, Weiskopf NG, Weng C, Zozus MN, Schilling L. A Harmonized Data Quality Assessment Terminology and Framework for the Secondary Use of Electronic Health Record Data. EGEMS (Wash DC). 2016 Sep 11;4(1):1244. doi: 10.13063/2327-9214.1244. PMID: 27713905; PMCID: PMC5051581.](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5051581/)
+
+# Diversity, Equity, and Inclusion Resources
+
+- [Nicole G. Weiskopf (NYU) and Carolyn Thompson (UCSD) – Bias in EHR - YouTube](https://youtu.be/8V-yO7GNNlw?feature=shared)
+- [How racial biases in medical algorithms lead to inequities in care | PBS News Weekend](https://www.pbs.org/newshour/show/how-racial-biases-in-medical-algorithms-lead-to-inequities-in-care)
+- [AI Reveals its Biases by Generating What it Thinks Professors Look Like | PetaPixel](https://petapixel.com/2023/05/04/ai-reveals-its-biases-by-generating-what-it-thinks-professors-look-like/)
+- [Does “AI” stand for augmenting inequality in the era of covid-19 healthcare? | The BMJ](https://www.bmj.com/content/372/bmj.n304)
+- [The AUC Data Science | Initiative (aucenter.edu)](https://datascience.aucenter.edu/)
+- [ReCode-Report.pdf (data.org)](https://datascience.aucenter.edu/)
+- [ADDI Researcher Roundtable: The Importance of Diversity in Dementia Research on Vimeo](https://vimeo.com/799212327?forcedownload=true&_=4007b451dfc8424fa5226c4615e147ea)
+- [Advancing Antiracism, Diversity, Equity, and Inclusion in STEMM Organizations: Beyond Broadening Participation |The National Academies Press](https://nap.nationalacademies.org/catalog/26803/advancing-antiracism-diversity-equity-and-inclusion-in-stemm-organizations-beyond)
+- [Data Literacy: The Composition Effect | Education | St. Louis Fed (stlouisfed.org)](https://www.stlouisfed.org/education/the-composition-effect)
+- [A lecture by Pilar Ossorio at MLHC Professor of Law and Bioethics at the University of Wisconsin Law School](https://www.youtube.com/watch?v=DzGSlWu4Lj0&list=PLRqwW7v078fYdZFpf43d0NBh4hiGCRtfV&index=6)
+- [This paper by Dunkelau and Leuschel that summarizes Fairness-aware Machine Learning](https://www.phil-fak.uni-duesseldorf.de/fileadmin/Redaktion/Institute/Sozialwissenschaften/Kommunikations-_und_Medienwissenschaft/KMW_I/Working_Paper/Dunkelau___Leuschel__2019__Fairness-Aware_Machine_Learning.pdf)
+- [A conversation with Cathy O’Neil, author of the critically acclaimed Weapons of Math Destruction - YouTube](https://www.youtube.com/watch?v=1QlIbed_Hwg)
+- [This Obermeyer et al paper on dissecting racial bias in an algorithm used to manage the health of populations - Science, 2019](https://science.sciencemag.org/content/366/6464/447)
+- [Fair ML Keynote talk + Microsoft talk + slides - Science, 2019](https://science.sciencemag.org/content/366/6464/447)
+- [Maria Hightower, M.D., M.B.A., MPH Chief Digital Technology officer of the University of Chicago Medicine comments on the racial bias in AI and the algorithm described above - Science, 2019](https://science.sciencemag.org/content/366/6464/447)
+- [How scientists are subtracting race from medical risk calculators - Science, 2021](https://science.sciencemag.org/content/366/6464/447)
+- [This paper summarizes how being aware of a protected class can lead to differences in fairness outcomes - Science](https://science.sciencemag.org/content/366/6464/447)
+- [Race After Technology, by Ruha Benjamin [Professor of African American studies at Princeton University], summarizes how technology [from data collection, data imputation, government policy, etc] can play a role in different outcomes in society - Science](https://science.sciencemag.org/content/366/6464/447)
+
+<!--TBD
+## Analysis with Python 
+
+### Required Python Libraries:
+
+To execute the Python queries, you'll need to install the pandas library. -->
